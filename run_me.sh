@@ -11,4 +11,5 @@ PYO3_NO_PYTHON=1 cargo build --target=wasm32-wasi
 wasmtime \
     --mapdir /data::data/ \
     --mapdir /usr::target/wasm32-wasi/wasi-deps/usr \
-    target/wasm32-wasi/debug/rust-py-sample.wasm
+    target/wasm32-wasi/debug/rust-py-sample.wasm \
+    data/sample_script.py  --image-path data/input.jpg

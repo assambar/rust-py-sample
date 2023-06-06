@@ -3,25 +3,27 @@ use pyo3::prelude::*;
 mod sample;
 use sample::sample_module;
 
+use std::ffi::{c_char, c_int, CString};
+
+fn to_raw_args(args: Vec<String>) -> Vec<*mut c_char> {
+    let mut raw_args: Vec<_> = args
+        .into_iter()
+        .map(|x| CString::new(x).unwrap().into_raw())
+        .collect();
+    raw_args.push(std::ptr::null_mut());
+    raw_args
+}
+
+pub fn py_main(args: Vec<String>) -> i32 {
+    let mut argv = to_raw_args(args);
+    let argc = (argv.len() - 1) as c_int;
+    unsafe { pyo3::ffi::Py_BytesMain(argc, argv.as_mut_ptr()) }
+}
+
 pub fn main() -> PyResult<()> {
     pyo3::append_to_inittab!(sample_module);
 
-    pyo3::prepare_freethreaded_python();
+    py_main(std::env::args().collect());
 
-    Python::with_gil(|py| -> PyResult<()> {
-        let fun: Py<PyAny> = PyModule::from_code(
-            py,
-            "def f(image_path):
-                import sample
-                tensor = sample.image_to_tensor('/data/input.jpg', 4, 4)
-                print(f'Transformed {image_path} to tensor: {tensor}')",
-            "",
-            "",
-        )?
-        .getattr("f")?
-        .into();
-
-        fun.call1(py, ("/data/input.jpg",))?;
-        Ok(())
-    })
+    Ok(())
 }
