@@ -9,7 +9,4 @@ image = { version = "0.23.14", default-features = false, features = ["gif", "jpe
 wasi-nn = { version = "0.2.1" }
 
 [build-dependencies]
-flate2 = "1.0.26"
-reqwest = { version = "0.11.18", features = ["blocking"] }
-tar = "0.4.38"
-bytes = "1.4.0"
+wlr-libpy = { git = "https://github.com/vmware-labs/webassembly-language-runtimes.git", features = ["build"] }
